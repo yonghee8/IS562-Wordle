@@ -8,7 +8,8 @@ BE SURE TO UPDATE THIS COMMENT WHEN YOU WRITE THE CODE.
 import random
 
 from WordleDictionary import FIVE_LETTER_WORDS
-from WordleGraphics import WordleGWindow, N_COLS, N_ROWS
+from WordleGraphics import WordleGWindow, N_COLS, N_ROWS, CORRECT_COLOR, PRESENT_COLOR, MISSING_COLOR
+
 
 # Choose a random word from the list
 random_word = random.choice(FIVE_LETTER_WORDS)
@@ -17,12 +18,40 @@ def wordle():
 
     def enter_action(s):
         user_word = s.lower()  # Convert the entered word to lowercase for case-insensitive comparison
-        
         if user_word in FIVE_LETTER_WORDS:
-            gw.show_message("You guessed a valid word!")
-        else:
-            gw.show_message("Not in word list")
+            # Check if the user guessed the entire word correctly
+            if user_word == random_word:
+                gw.show_message("You guessed the word correctly!")
+            else:
+                # Initialize lists to keep track of letters that are correctly guessed, present but in the wrong place, and missing
+                correct_letters = []
+                present_letters = []
+                missing_letters = []
 
+                # Check each letter in the user's guess
+                for col, letter in enumerate(user_word):
+                    if letter == random_word[col]:
+                        correct_letters.append(col)
+                    elif letter in random_word:
+                        present_letters.append(col)
+                    else:
+                        missing_letters.append(col)
+
+                # Set colors for correct letters
+                for col in correct_letters:
+                    gw.set_square_color(gw.get_current_row(), col, CORRECT_COLOR)
+
+                # Set colors for letters that are present but in the wrong place
+                for col in present_letters:
+                    gw.set_square_color(gw.get_current_row(), col, PRESENT_COLOR)
+
+                # Move on to the next row
+                gw.set_current_row(gw.get_current_row() + 1)
+
+        else:
+            gw.show_message("Not a valid word")
+
+                 
     gw = WordleGWindow()
     gw.add_enter_listener(enter_action)
 
